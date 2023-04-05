@@ -6,6 +6,7 @@ import functions
 import plotly.graph_objs as go
 import pandas as pd
 import os
+import yfinance as yf
 
 app = Flask(__name__)
 
@@ -85,30 +86,19 @@ def add():
     # timestamp 30 days ago
     timestamp_30_days_ago = timestamp - 2592000
 
-    link = "https://query1.finance.yahoo.com/v7/finance/download/" + cours + \
-        "?period1=" + str(timestamp_one_year_ago) + "&period2=" + str(timestamp_one_minute_ago) + \
-        "&interval=1d&events=history&includeAdjustedClose=true"
+    # download csv from yahoo finance
+    yf_cours = yf.Ticker(cours)
+    yf_cours.history(period="1d", interval="1m")
+    yf_cours.history(start=timestamp_one_year_ago, end=timestamp, interval="1d")
     
-    
-    #link = link.replace('=', '%3D')
-    filepath = 'temp/' + cours + '.csv'
-    user_agent = {
-        'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0'}
-    
-    # Check status code of link
-    status_code = requests.get(link, headers=user_agent).status_code
-    if status_code != 200:
-        return 'Cours introuvable'
+    # Get data from yahoo finance
+    data = yf_cours.history(start=timestamp_one_year_ago, end=timestamp_one_minute_ago, interval="1d")
+    data = data.reset_index()
+    # Save data to csv
+    data.to_csv('temp/' + cours + '.csv', index=False)
 
-    with requests.get(link, headers=user_agent, stream=True) as r:
-        if r.status_code != 200:
-            print(r.status_code)
-        with open(filepath, 'wb') as f:
-            f.write(r.content)
-            # Add csv in mongodb
-        #if r.status_code == 200:
-        functions.add_csv_to_mongodb(name, filepath)
-        functions.update_stats(name, cours)
+    functions.add_csv_to_mongodb(name, 'temp/' + cours + '.csv')
+    functions.update_stats(name, cours)
     return redirect(url_for('home'))
 
 

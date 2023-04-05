@@ -8,17 +8,20 @@
 </head>
 
 <body>
-  <div class="container">
+  <div class="container d-flex flex-column align-items-center">
     <h1>Outil de suivi de cours de devises</h1>
     <button type="button" class="btn btn-primary mb-5" data-toggle="modal" data-target="#myModal">+ Ajouter un
       cours</button>
-
+  </div>
+  <div class="container">
     {% if graphs %}
     <h2>Cours enregistrés</h2>
     {% for graph in graphs %}
     <div class="card mb-3">
       <div class="card-header d-flex justify-content-between">
         <h3>{{ graph.cours }}</h3>
+        <button class="btn btn-primary btn-sm update-btn" data-cours="{{ graph.cours }}"
+          data-name="{{ graph.name }}">Actualiser</button>
         <button class="btn btn-danger btn-sm" data-cours="{{ graph.cours }}">Supprimer</button>
       </div>
       <div class="card-body">
@@ -37,9 +40,9 @@
               </div>
               <div class="card-body text-center">
                 {% if graph.stats.day > 0 %}
-                  <h4 class="text-success">{{ graph.stats.day }} %</h4>
+                <h4 class="text-success">+{{ graph.stats.day }} %</h4>
                 {% else %}
-                  <h4 class="text-danger">{{ graph.stats.day }} %</h4>
+                <h4 class="text-danger">{{ graph.stats.day }} %</h4>
                 {% endif %}
               </div>
             </div>
@@ -51,9 +54,9 @@
               </div>
               <div class="card-body text-center">
                 {% if graph.stats.week > 0 %}
-                  <h4 class="text-success">{{ graph.stats.week }} %</h4>
+                <h4 class="text-success">+{{ graph.stats.week }} %</h4>
                 {% else %}
-                  <h4 class="text-danger">{{ graph.stats.week }} %</h4>
+                <h4 class="text-danger">{{ graph.stats.week }} %</h4>
                 {% endif %}
               </div>
             </div>
@@ -65,9 +68,9 @@
               </div>
               <div class="card-body text-center">
                 {% if graph.stats.month > 0 %}
-                  <h4 class="text-success">{{ graph.stats.month }} %</h4>
+                <h4 class="text-success">+{{ graph.stats.month }} %</h4>
                 {% else %}
-                  <h4 class="text-danger">{{ graph.stats.month }} %</h4>
+                <h4 class="text-danger">{{ graph.stats.month }} %</h4>
                 {% endif %}
               </div>
             </div>
@@ -146,9 +149,17 @@
         console.log('Suppression du cours ' + btn.dataset.cours);
         const cours = btn.dataset.cours;
         fetch(`/delete`, { method: 'POST', body: JSON.stringify({ 'cours': cours }), headers: { 'Content-Type': 'application/json' } })
-          .then(response => 
+          .then(response =>
             window.location.href = '/'
           );
+      });
+    });
+
+    const updateBtns = document.querySelectorAll('.update-btn');
+    updateBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        console.log('Mise à jour du cours ' + btn.dataset.cours);
+        window.location.href = '/add?cours=' + btn.dataset.name + '&name=' + btn.dataset.cours;
       });
     });
   </script>
