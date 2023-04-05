@@ -25,20 +25,30 @@ def home():
 
     # Get all cours followed by user
     # followed_cours content of temp folder
-    followed_cours = functions.get_stats()
+    stats = functions.get_stats()
+    if stats.empty:
+        followed_cours = []
+    else:
+        followed_cours = stats['cours']
+    
+    print(followed_cours)
     graphs = []
 
     for cours in followed_cours:
         # Charger les données à partir d'un fichier CSV
         try:
-            data = pd.read_csv('temp/' + cours)
+            print(cours)
+            data = functions.get_data(cours)
+            print(data)
         except:
             continue
-
+        print('Ici :')
+        print(data['Date'])
+        print(data['Close'])
         # Créer une trace pour le graphique
         trace = go.Scatter(
             x=pd.to_datetime(data['Date']),
-            y=data['Close'],
+            y=data['Close'].astype(float),
             mode='lines'
         )
 
@@ -54,16 +64,16 @@ def home():
 
         # Convertir la figure en HTML pour l'afficher dans la vue Flask
         graph_html = fig.to_html(full_html=False)
-        # remove .csv from cours name
-        cours = cours[:-4]
+
         graphs.append({'cours': cours, 'graph_html': graph_html})
 
     return render_template('home.html', cours=cours_list, graphs=graphs)
 
 
-@app.route("/add/<cours>", methods=['GET'])
-def add(cours):
-    print(cours)
+@app.route("/add", methods=['GET'])
+def add():
+    cours = request.args.get('cours')
+    name = request.args.get('name')
     now = datetime.datetime.now()
     timestamp = datetime.datetime.timestamp(now)
     timestamp = int(timestamp)
@@ -93,12 +103,14 @@ def add(cours):
             f.write(r.content)
             # Add csv in mongodb
         #if r.status_code == 200:
-        functions.add_csv_to_mongodb(cours, filepath)
+        functions.add_csv_to_mongodb(name, filepath)
+        functions.update_stats(cours, name)
     return redirect(url_for('home'))
 
 
-@app.route("/delete/<cours>", methods=['GET'])
-def delete(cours):
+@app.route("/delete", methods=['POST'])
+def delete():
+    cours = request.get_json()['cours']
     functions.delete_collection(cours)
     return redirect(url_for('home'))
 
