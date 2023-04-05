@@ -32,9 +32,9 @@ def get_data_range(cours, range):
 def get_data(cours):
     return pd.DataFrame(db[cours].find().sort([('Date', 1)]))
 
-def update_stats(cours):
+def update_stats(cours, name):
     ranges = ["day", "week", "month"]
-    stats = {"cours": db[cours].name}
+    stats = {"cours": cours, "name": name}
     for range in ranges:
         data_range = get_data_range(cours, range)
         current_day_close = float(data_range[0]["Close"])
@@ -43,7 +43,7 @@ def update_stats(cours):
         stats[range] = stat
 
     db["stats"].replace_one(
-        {"cours": db[cours].name},
+        {"cours": cours},
         stats,
         upsert=True
     )
