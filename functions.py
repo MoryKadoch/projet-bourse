@@ -42,8 +42,8 @@ def update_stats(cours, name):
         data_range = get_data_range(cours, range)
         current_day_close = float(data_range[0]["Close"])
         last_day_close = float(data_range[-1]["Close"])
-        stat = round(current_day_close - last_day_close, 6)
-        stat_percentage = round((current_day_close - last_day_close) / last_day_close * 100, 2)
+        stat = round(current_day_close - last_day_close, 4)
+        stat_percentage = round((current_day_close - last_day_close) / last_day_close * 100, 4)
         stats[range] = stat
         stats[range + "_percent"] = stat_percentage
 
