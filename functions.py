@@ -42,7 +42,7 @@ def update_stats(cours, name):
         data_range = get_data_range(cours, range)
         current_day_close = float(data_range[0]["Close"])
         last_day_close = float(data_range[-1]["Close"])
-        stat = round(current_day_close - last_day_close, 6)
+        stat = round(current_day_close - last_day_close, 4)
         stats[range] = stat
 
     db["stats"].replace_one(
