@@ -2,9 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for
 import requests
 from bs4 import BeautifulSoup
 import datetime
-#import functions
+import functions
 import plotly.graph_objs as go
 import pandas as pd
+import os
 
 app = Flask(__name__)
 
@@ -22,13 +23,13 @@ def home():
         inner_html_list.append(inner_html)
 
     # Get all cours followed by user
-    #followed_cours = functions.get_followed_cours()
-    followed_cours = ['EURCAD=X', 'EURUSD=X']
+    #followed_cours content of temp folder
+    followed_cours = os.listdir('temp')
     graphs = []
 
     for cours in followed_cours:
         # Charger les données à partir d'un fichier CSV
-        data = pd.read_csv('temp/' + cours + '.csv')
+        data = pd.read_csv('temp/' + cours)
 
         # Créer une trace pour le graphique
         trace = go.Scatter(
@@ -49,6 +50,8 @@ def home():
 
         # Convertir la figure en HTML pour l'afficher dans la vue Flask
         graph_html = fig.to_html(full_html=False)
+        # remove .csv from cours name
+        cours = cours[:-4]
         graphs.append({'cours': cours, 'graph_html': graph_html})
 
     return render_template('home.html', cours=inner_html_list, graphs=graphs)
@@ -68,14 +71,17 @@ def add(cours):
     link = "https://query1.finance.yahoo.com/v7/finance/download/" + cours + \
         "?period1=" + str(timestamp_one_year_ago) + "&period2=" + str(timestamp) + \
         "&interval=1d&events=history&includeAdjustedClose=true"
+    print(link)
     filepath = 'temp/' + cours + '.csv'
     user_agent = {
         'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0'}
-    with requests.get(link, headers=user_agent) as r:
+    # Prevent invalid cookie header error
+    
+    with requests.get(link, headers=user_agent, stream=True) as r:
         with open(filepath, 'wb') as f:
             f.write(r.content)
             # Add csv in mongodb
-            #functions.add_csv_to_mongodb(cours, filepath)
+        functions.add_csv_to_mongodb(functions.db[cours], filepath)
     return redirect(url_for('home'))
 
 
@@ -96,6 +102,9 @@ def get_prices(cours):
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Find the div with class "D(ib) Mend(20px)" and get its html content
+    if(soup.find('div', class_='D(ib) Mend(20px)') == None):
+        return "Cours introuvable"
+    
     div_content = soup.find('div', class_='D(ib) Mend(20px)').decode_contents()
 
     # Create a new BeautifulSoup object for the div content
@@ -111,7 +120,7 @@ def get_prices(cours):
         div_soup.find('span').attrs['class'] = 'h4 text-danger'
     else:
         div_soup.find('span').attrs['class'] = 'h4 text-success'
-        
+
     # Get the HTML content as a string
     formatted_html = str(div_soup)
 

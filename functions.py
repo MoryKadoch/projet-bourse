@@ -1,5 +1,9 @@
 import csv
 import datetime
+import pymongo
+
+client = pymongo.MongoClient('mongodb+srv://root:KDjt96Njs72Lp4c0@cluster0.3txvxzn.mongodb.net/test')
+db = client['projet-bourse']
 
 def add_csv_to_mongodb(cours_collection, csv_file):
     with open(csv_file) as file:
