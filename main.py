@@ -25,13 +25,16 @@ def home():
 
     # Get all cours followed by user
     # followed_cours content of temp folder
-    followed_cours = functions.get_stats()
+    followed_cours = functions.get_stats()[0]['cours']
+    print(followed_cours)
     graphs = []
 
     for cours in followed_cours:
         # Charger les données à partir d'un fichier CSV
         try:
-            data = pd.read_csv('temp/' + cours)
+            print(cours)
+            data = functions.get_data(cours)
+            print(data)
         except:
             continue
 
