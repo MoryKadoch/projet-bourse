@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Bourse</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Outil de suivi de cours de devises</h1>
+    <button type="button" class="btn btn-primary mb-5" data-toggle="modal" data-target="#myModal">+ Ajouter un
+      cours</button>
+
+    {% if graphs %}
+    <h2>Cours enregistrés</h2>
+    {% for graph in graphs %}
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between">
+        <h3>{{ graph.cours }}</h3>
+        <button class="btn btn-danger btn-sm" data-cours="{{ graph.cours }}">Supprimer</button>
+      </div>
+      <div class="card-body">
+        <div class="yahoo-content-{{ loop.index }}">
+          {% if graph.yahoo_html %}
+          {{ graph.yahoo_html|safe }}
+          {% else %}
+          <p>Chargement en cours...</p>
+          {% endif %}
+        </div>
+        {{ graph.graph_html|safe }}
+      </div>
+    </div>
+    <script>
+      // Appelle la route Flask pour récupérer le contenu HTML de la page Yahoo
+      setInterval(() => {
+        fetch('/get/prices/{{ graph.cours }}')
+          .then(response => response.text())
+          .then(html => {
+            const yahooContent = document.querySelector('.card-body .yahoo-content-{{ loop.index }}');
+            yahooContent.innerHTML = html;
+          });
+      }, 5000);
+    </script>
+    {% endfor %}
+
+
+    {% else %}
+    <h2>Aucun cours enregistré</h2>
+    {% endif %}
+  </div>
+
+  <!-- popup -->
+  <div class="modal" id="myModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- En-tête du popup -->
+        <div class="modal-header">
+          <h4 class="modal-title">Ajouter un cours</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Corps du popup -->
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="select-cours">Choisissez un cours :</label>
+            <select class="form-control" id="select-cours">
+              {% for c in cours %}
+              <option value="{{ c }}">{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="addCours()">Ajouter</button>
+        </div>
+
+        <!-- Pied de page du popup -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function addCours() {
+      var selectCours = document.getElementById("select-cours");
+      var selectedCours = selectCours.options[selectCours.selectedIndex].value;
+      window.location.href = '/add/' + selectedCours;
+    }
+  </script>
+
+  <script>
+    const deleteBtns = document.querySelectorAll('.btn-danger');
+    deleteBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        console.log('Suppression du cours ' + btn.dataset.cours);
+        const cours = btn.dataset.cours;
+        fetch(`/delete/${cours}`, { method: 'GET' })
+          .then(response => {
+            if (response.ok) {
+              location.reload();
+            } else {
+              throw new Error('Erreur lors de la suppression du cours');
+            }
+          })
+          .catch(error => console.log(error));
+      });
+    });
+  </script>
+
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
