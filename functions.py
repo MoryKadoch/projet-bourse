@@ -5,14 +5,17 @@ import pymongo
 client = pymongo.MongoClient('mongodb+srv://root:KDjt96Njs72Lp4c0@cluster0.3txvxzn.mongodb.net/test')
 db = client['projet-bourse']
 
-def add_csv_to_mongodb(cours_collection, csv_file):
+def add_csv_to_mongodb(db, cours, csv_file):
+    db[cours].drop()
+    db[cours].create_index([("Date", pymongo.DESCENDING)])
+
     with open(csv_file) as file:
         reader = csv.DictReader(file)
         data = [row for row in reader]
-        cours_collection.insert_many(data)
+        db[cours].insert_many(data)
 
 # range = day|week|month
-def get_data_range(cours_collection, range):
+def get_data_range(db, cours, range):
     today = datetime.datetime.today()
     start_date = today
     if (range == "day"):
@@ -23,22 +26,24 @@ def get_data_range(cours_collection, range):
         start_date = today - datetime.timedelta(days=31)
         
     # get data range sorted in descending order by dates
-    return list(cours_collection.find({"Date": {"$gt": str(start_date)}}).sort([('date', -1)]))
+    return list(db[cours].find({"Date": {"$gt": str(start_date)}}).sort([('date', -1)]))
 
-def update_stats(stats_collection, cours_collection):
+def update_stats(db, cours):
     ranges = ["day", "week", "month"]
-    stats = {"cours": cours_collection.name}
+    stats = {"cours": db[cours].name}
     for range in ranges:
-        data_range = get_data_range(cours_collection, range)
+        data_range = get_data_range(db, cours, range)
         current_day_close = float(data_range[0]["Close"])
         last_day_close = float(data_range[-1]["Close"])
         stat = (current_day_close - last_day_close) / last_day_close * 100
         stats[range] = stat
 
-    stats_collection.replace_one(
-        {"cours": cours_collection.name},
+    db["stats"].replace_one(
+        {"cours": db[cours].name},
         stats,
         upsert=True
     )
 
-# TODO index on date
+def delete_collection(db, cours):
+    db[cours].drop()
+    db["stats"].remove({"cours", cours})
