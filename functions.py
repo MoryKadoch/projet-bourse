@@ -35,10 +35,11 @@ def get_data(cours):
 def update_stats(cours, name):
     ranges = ["day", "week", "month"]
     stats = {"cours": cours, "name": name}
+    # TODO faire ci-dessous en mongodb
     for range in ranges:
         data_range = get_data_range(cours, range)
-        current_day_close = float(data_range[0]["Close"])
-        last_day_close = float(data_range[-1]["Close"])
+        current_day_close = round(float(data_range[0]["Close"]), 2)
+        last_day_close = round(float(data_range[-1]["Close"]), 2)
         stat = (current_day_close - last_day_close) / last_day_close * 100
         stats[range] = stat
 
@@ -54,3 +55,5 @@ def delete_collection(cours):
 
 def get_stats():
     return pd.DataFrame(db["stats"].find())
+
+# get more perfomant currency for the month
