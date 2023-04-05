@@ -1,6 +1,7 @@
 import csv
 import datetime
 import pymongo
+import pandas as pd
 
 client = pymongo.MongoClient('mongodb+srv://root:KDjt96Njs72Lp4c0@cluster0.3txvxzn.mongodb.net/test')
 db = client['projet-bourse']
@@ -29,13 +30,13 @@ def get_data_range(cours, range):
     return list(db[cours].find({"Date": {"$gt": str(start_date)}}).sort([('Date', -1)]))
 
 def get_data(cours):
-    return list(db[cours].find({}).sort([('Date', 1)]))
+    return pd.DataFrame(db[cours].find().sort([('Date', 1)]))
 
 def update_stats(cours):
     ranges = ["day", "week", "month"]
     stats = {"cours": db[cours].name}
     for range in ranges:
-        data_range = get_data_range(db, cours, range)
+        data_range = get_data_range(cours, range)
         current_day_close = float(data_range[0]["Close"])
         last_day_close = float(data_range[-1]["Close"])
         stat = (current_day_close - last_day_close) / last_day_close * 100
@@ -52,4 +53,4 @@ def delete_collection(cours):
     db["stats"].delete_one({"cours": cours})
 
 def get_stats():
-    return db["stats"].find()
+    return pd.DataFrame(db["stats"].find())
