@@ -5,7 +5,7 @@ import pymongo
 client = pymongo.MongoClient('mongodb+srv://root:KDjt96Njs72Lp4c0@cluster0.3txvxzn.mongodb.net/test')
 db = client['projet-bourse']
 
-def add_csv_to_mongodb(db, cours, csv_file):
+def add_csv_to_mongodb(cours, csv_file):
     db[cours].drop()
     db[cours].create_index([("Date", pymongo.DESCENDING)])
 
@@ -15,7 +15,7 @@ def add_csv_to_mongodb(db, cours, csv_file):
         db[cours].insert_many(data)
 
 # range = day|week|month
-def get_data_range(db, cours, range):
+def get_data_range(cours, range):
     today = datetime.datetime.today()
     start_date = today
     if (range == "day"):
@@ -26,9 +26,12 @@ def get_data_range(db, cours, range):
         start_date = today - datetime.timedelta(days=31)
         
     # get data range sorted in descending order by dates
-    return list(db[cours].find({"Date": {"$gt": str(start_date)}}).sort([('date', -1)]))
+    return list(db[cours].find({"Date": {"$gt": str(start_date)}}).sort([('Date', -1)]))
 
-def update_stats(db, cours):
+def get_data(cours):
+    return list(db[cours].find({}).sort([('Date', 1)]))
+
+def update_stats(cours):
     ranges = ["day", "week", "month"]
     stats = {"cours": db[cours].name}
     for range in ranges:
@@ -44,6 +47,9 @@ def update_stats(db, cours):
         upsert=True
     )
 
-def delete_collection(db, cours):
+def delete_collection(cours):
     db[cours].drop()
     db["stats"].delete_one({"cours": cours})
+
+def get_stats():
+    return db["stats"].find()
