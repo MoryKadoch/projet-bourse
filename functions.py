@@ -38,9 +38,9 @@ def update_stats(cours, name):
     # TODO faire ci-dessous en mongodb
     for range in ranges:
         data_range = get_data_range(cours, range)
-        current_day_close = round(float(data_range[0]["Close"]), 2)
-        last_day_close = round(float(data_range[-1]["Close"]), 2)
-        stat = (current_day_close - last_day_close) / last_day_close * 100
+        current_day_close = float(data_range[0]["Close"])
+        last_day_close = float(data_range[-1]["Close"])
+        stat = round((current_day_close - last_day_close) / last_day_close * 100, 2)
         stats[range] = stat
 
     db["stats"].replace_one(
