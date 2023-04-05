@@ -85,13 +85,20 @@ def add():
     # timestamp 30 days ago
     timestamp_30_days_ago = timestamp - 2592000
 
-    link = "http://query1.finance.yahoo.com/v7/finance/download/" + cours + \
+    link = "https://query1.finance.yahoo.com/v7/finance/download/" + cours + \
         "?period1=" + str(timestamp_one_year_ago) + "&period2=" + str(timestamp_one_minute_ago) + \
         "&interval=1d&events=history&includeAdjustedClose=true"
+    
+    
     #link = link.replace('=', '%3D')
     filepath = 'temp/' + cours + '.csv'
     user_agent = {
         'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0'}
+    
+    # Check status code of link
+    status_code = requests.get(link, headers=user_agent).status_code
+    if status_code != 200:
+        return 'Cours introuvable'
 
     with requests.get(link, headers=user_agent, stream=True) as r:
         if r.status_code != 200:

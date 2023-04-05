@@ -29,41 +29,50 @@
           <p>Chargement en cours...</p>
           {% endif %}
         </div>
-        {% if graph.stats.day > 0 %}
-        <div class="stat-box bg-success">
-          <h5>Jour</h5>
-          <p class="percent">+{{ graph.stats.day }} %</p>
+        <div class="row mt-3">
+          <div class="col-sm-4">
+            <div class="card border-secondary rounded">
+              <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Jour</h5>
+              </div>
+              <div class="card-body text-center">
+                {% if graph.stats.day > 0 %}
+                  <h4 class="text-success">{{ graph.stats.day }} %</h4>
+                {% else %}
+                  <h4 class="text-danger">{{ graph.stats.day }} %</h4>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="card border-secondary rounded">
+              <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Semaine</h5>
+              </div>
+              <div class="card-body text-center">
+                {% if graph.stats.week > 0 %}
+                  <h4 class="text-success">{{ graph.stats.week }} %</h4>
+                {% else %}
+                  <h4 class="text-danger">{{ graph.stats.week }} %</h4>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="card border-secondary rounded">
+              <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Mois</h5>
+              </div>
+              <div class="card-body text-center">
+                {% if graph.stats.month > 0 %}
+                  <h4 class="text-success">{{ graph.stats.month }} %</h4>
+                {% else %}
+                  <h4 class="text-danger">{{ graph.stats.month }} %</h4>
+                {% endif %}
+              </div>
+            </div>
+          </div>
         </div>
-        {% else %}
-        <div class="stat-box bg-danger">
-          <h5>Jour</h5>
-          <p class="percent">{{ graph.stats.day }} %</p>
-        </div>
-        {% endif %}
-
-        {% if graph.stats.week > 0 %}
-        <div class="stat-box bg-success">
-          <h5>Semaine</h5>
-          <p class="percent">+{{ graph.stats.week }} %</p>
-        </div>
-        {% else %}
-        <div class="stat-box bg-danger">
-          <h5>Semaine</h5>
-          <p class="percent">{{ graph.stats.week }} %</p>
-        </div>
-        {% endif %}
-
-        {% if graph.stats.month > 0 %}
-        <div class="stat-box bg-success">
-          <h5>Mois</h5>
-          <p class="percent">+{{ graph.stats.month }} %</p>
-        </div>
-        {% else %}
-        <div class="stat-box bg-danger">
-          <h5>Mois</h5>
-          <p class="percent">{{ graph.stats.month }} %</p>
-        </div>
-        {% endif %}
 
         {{ graph.graph_html|safe }}
       </div>
@@ -137,7 +146,7 @@
         console.log('Suppression du cours ' + btn.dataset.cours);
         const cours = btn.dataset.cours;
         fetch(`/delete`, { method: 'POST', body: JSON.stringify({ 'cours': cours }), headers: { 'Content-Type': 'application/json' } })
-          .then(response =>
+          .then(response => 
             window.location.href = '/'
           );
       });
