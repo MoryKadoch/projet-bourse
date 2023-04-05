@@ -31,20 +31,13 @@ def home():
     else:
         followed_cours = stats['cours']
     
-    print(followed_cours)
     graphs = []
 
     for cours in followed_cours:
-        # Charger les données à partir d'un fichier CSV
         try:
-            print(cours)
             data = functions.get_data(cours)
-            print(data)
         except:
             continue
-        print('Ici :')
-        print(data['Date'])
-        print(data['Close'])
         # Créer une trace pour le graphique
         trace = go.Scatter(
             x=pd.to_datetime(data['Date']),
@@ -65,7 +58,12 @@ def home():
         # Convertir la figure en HTML pour l'afficher dans la vue Flask
         graph_html = fig.to_html(full_html=False)
 
-        graphs.append({'cours': cours, 'graph_html': graph_html})
+        # Find cours name in stats with cours key
+        name = stats[stats['cours'] == cours]['name'].values[0]
+        cours_stats = stats[stats['cours'] == cours].to_dict('records')[0]
+        print(cours_stats)
+        
+        graphs.append({'cours': cours, 'name' : name, 'graph_html': graph_html, 'stats': cours_stats})
 
     return render_template('home.html', cours=cours_list, graphs=graphs)
 
@@ -90,7 +88,6 @@ def add():
     link = "http://query1.finance.yahoo.com/v7/finance/download/" + cours + \
         "?period1=" + str(timestamp_one_year_ago) + "&period2=" + str(timestamp_one_minute_ago) + \
         "&interval=1d&events=history&includeAdjustedClose=true"
-    print(link)
     #link = link.replace('=', '%3D')
     filepath = 'temp/' + cours + '.csv'
     user_agent = {
@@ -104,22 +101,22 @@ def add():
             # Add csv in mongodb
         #if r.status_code == 200:
         functions.add_csv_to_mongodb(name, filepath)
-        functions.update_stats(cours, name)
+        functions.update_stats(name, cours)
     return redirect(url_for('home'))
 
 
 @app.route("/delete", methods=['POST'])
 def delete():
     cours = request.get_json()['cours']
+    print(cours)
     functions.delete_collection(cours)
-    return redirect(url_for('home'))
+    return 'ok'
 
 
 @app.route("/get/prices/<cours>", methods=['GET'])
 def get_prices(cours):
     # Get price from yahoo
     url = 'https://fr.finance.yahoo.com/quote/' + cours
-    print(url)
     user_agent = {
         'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0'}
     response = requests.get(url, headers=user_agent)

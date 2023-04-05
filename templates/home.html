@@ -29,13 +29,49 @@
           <p>Chargement en cours...</p>
           {% endif %}
         </div>
+        {% if graph.stats.day > 0 %}
+        <div class="stat-box bg-success">
+          <h5>Jour</h5>
+          <p class="percent">+{{ graph.stats.day }} %</p>
+        </div>
+        {% else %}
+        <div class="stat-box bg-danger">
+          <h5>Jour</h5>
+          <p class="percent">{{ graph.stats.day }} %</p>
+        </div>
+        {% endif %}
+
+        {% if graph.stats.week > 0 %}
+        <div class="stat-box bg-success">
+          <h5>Semaine</h5>
+          <p class="percent">+{{ graph.stats.week }} %</p>
+        </div>
+        {% else %}
+        <div class="stat-box bg-danger">
+          <h5>Semaine</h5>
+          <p class="percent">{{ graph.stats.week }} %</p>
+        </div>
+        {% endif %}
+
+        {% if graph.stats.month > 0 %}
+        <div class="stat-box bg-success">
+          <h5>Mois</h5>
+          <p class="percent">+{{ graph.stats.month }} %</p>
+        </div>
+        {% else %}
+        <div class="stat-box bg-danger">
+          <h5>Mois</h5>
+          <p class="percent">{{ graph.stats.month }} %</p>
+        </div>
+        {% endif %}
+
         {{ graph.graph_html|safe }}
       </div>
     </div>
     <script>
       // Appelle la route Flask pour récupérer le contenu HTML de la page Yahoo
       setInterval(() => {
-        fetch('/get/prices/{{ graph.cours }}')
+        fetch('/get/prices/{{ graph.name }}')
           .then(response => response.text())
           .then(html => {
             const yahooContent = document.querySelector('.card-body .yahoo-content-{{ loop.index }}');
@@ -100,13 +136,10 @@
       btn.addEventListener('click', () => {
         console.log('Suppression du cours ' + btn.dataset.cours);
         const cours = btn.dataset.cours;
-        fetch(`/delete`, { method: 'POST', body: JSON.stringify({ 'cours' : cours }), headers: { 'Content-Type': 'application/json' }})
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              window.location.href = '/';
-            }
-          });
+        fetch(`/delete`, { method: 'POST', body: JSON.stringify({ 'cours': cours }), headers: { 'Content-Type': 'application/json' } })
+          .then(response =>
+            window.location.href = '/'
+          );
       });
     });
   </script>
