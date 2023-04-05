@@ -46,4 +46,4 @@ def update_stats(db, cours):
 
 def delete_collection(db, cours):
     db[cours].drop()
-    db["stats"].remove({"cours", cours})
+    db["stats"].delete_one({"cours": cours})
