@@ -2,6 +2,8 @@ import csv
 import datetime
 import pymongo
 import pandas as pd
+from datetime import timezone
+import datetime
 
 client = pymongo.MongoClient('mongodb+srv://root:KDjt96Njs72Lp4c0@cluster0.3txvxzn.mongodb.net/test')
 db = client['projet-bourse']
@@ -17,7 +19,7 @@ def add_csv_to_mongodb(cours, csv_file):
 
 # range = day|week|month
 def get_data_range(cours, range):
-    today = datetime.datetime.today()
+    today = datetime.datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     start_date = today
     if (range == "day"):
         start_date = today - datetime.timedelta(days=2)
@@ -25,7 +27,7 @@ def get_data_range(cours, range):
         start_date = today - datetime.timedelta(days=8)
     elif (range == "month"):
         start_date = today - datetime.timedelta(days=31)
-        
+    
     # get data range sorted in descending order by dates
     return list(db[cours].find({"Date": {"$gt": str(start_date)}}).sort([('Date', -1)]))
 
@@ -40,7 +42,7 @@ def update_stats(cours, name):
         data_range = get_data_range(cours, range)
         current_day_close = float(data_range[0]["Close"])
         last_day_close = float(data_range[-1]["Close"])
-        stat = round((current_day_close - last_day_close) / last_day_close * 100, 2)
+        stat = round(current_day_close - last_day_close, 6)
         stats[range] = stat
 
     db["stats"].replace_one(
@@ -55,5 +57,3 @@ def delete_collection(cours):
 
 def get_stats():
     return pd.DataFrame(db["stats"].find())
-
-# get more perfomant currency for the month
