@@ -40,11 +40,11 @@
               </div>
               <div class="card-body text-center">
                 {% if graph.stats.day > 0 %}
-                <h4 class="text-success">+{{ graph.stats.day }}</h4>
-                <span>(+{{ graph.stats.day_percent }} %)</span>
+                <h4 class="text-success">+{{ "{:,.4f}".format(graph.stats.day).replace('.', ',') }}</h4>
+                <span>(+{{ "{:,.4f}".format(graph.stats.day_percent).replace('.', ',') }} %)</span>
                 {% else %}
-                <h4 class="text-danger">{{ graph.stats.day }}</h4>
-                <span>({{ graph.stats.day_percent }} %)</span>
+                <h4 class="text-danger">{{ "{:,.4f}".format(graph.stats.day).replace('.', ',') }}</h4>
+                <span>({{ "{:,.4f}".format(graph.stats.day_percent).replace('.', ',') }} %)</span>
                 {% endif %}
               </div>
             </div>
@@ -56,11 +56,11 @@
               </div>
               <div class="card-body text-center">
                 {% if graph.stats.week > 0 %}
-                <h4 class="text-success">+{{ graph.stats.week }}</h4>
-                <span>(+{{ graph.stats.week_percent }} %)</span>
+                <h4 class="text-success">+{{ "{:,.4f}".format(graph.stats.week).replace('.', ',') }}</h4>
+                <span>(+{{ "{:,.4f}".format(graph.stats.week_percent).replace('.', ',') }} %)</span>
                 {% else %}
-                <h4 class="text-danger">{{ graph.stats.week }}</h4>
-                <span>({{ graph.stats.week_percent }} %)</span>
+                <h4 class="text-danger">{{ "{:,.4f}".format(graph.stats.week).replace('.', ',') }}</h4>
+                <span>({{ "{:,.4f}".format(graph.stats.week_percent).replace('.', ',') }} %)</span>
                 {% endif %}
               </div>
             </div>
@@ -72,11 +72,11 @@
               </div>
               <div class="card-body text-center">
                 {% if graph.stats.month > 0 %}
-                <h4 class="text-success">+{{ graph.stats.month }}</h4>
-                <span>(+{{ graph.stats.month_percent }} %)</span>
+                <h4 class="text-success">+{{ "{:,.4f}".format(graph.stats.month).replace('.', ',') }}</h4>
+                <span>(+{{ "{:,.4f}".format(graph.stats.month_percent).replace('.', ',') }} %)</span>
                 {% else %}
-                <h4 class="text-danger">{{ graph.stats.month }}</h4>
-                <span>({{ graph.stats.month_percent }} %)</span>
+                <h4 class="text-danger">{{ "{:,.4f}".format(graph.stats.month).replace('.', ',') }}</h4>
+                <span>({{ "{:,.4f}".format(graph.stats.month_percent).replace('.', ',') }} %)</span>
                 {% endif %}
               </div>
             </div>
