@@ -68,7 +68,7 @@
             <label for="select-cours">Choisissez un cours :</label>
             <select class="form-control" id="select-cours">
               {% for c in cours %}
-              <option value="{{ c }}">{{ c }}</option>
+              <option value="{{ c.key }}">{{ c.title }}</option>
               {% endfor %}
             </select>
           </div>
