@@ -88,7 +88,6 @@
     <script>
       // Appelle la route Flask pour récupérer le contenu HTML de la page Yahoo
       setInterval(() => {
-        console.log({{ loop.index }});
         fetch('/get/prices/{{ graph.name }}')
           .then(response => response.text())
           .then(html => {
@@ -138,39 +137,6 @@
     </div>
   </div>
 
-  <script>
-    function addCours() {
-      var selectCours = document.getElementById("select-cours");
-      var selectedCours = selectCours.options[selectCours.selectedIndex].value;
-      var coursName = selectCours.options[selectCours.selectedIndex].text;
-      //encodedCoursName = encodeURIComponent(coursName);
-      window.location.href = '/add?cours=' + selectedCours + '&name=' + coursName;
-    }
-  </script>
-
-  <script>
-    const deleteBtns = document.querySelectorAll('.btn-danger');
-    deleteBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        console.log('Suppression du cours ' + btn.dataset.cours);
-        const cours = btn.dataset.cours;
-        fetch(`/delete`, { method: 'POST', body: JSON.stringify({ 'cours': cours }), headers: { 'Content-Type': 'application/json' } })
-          .then(response =>
-            window.location.href = '/'
-          );
-      });
-    });
-
-    const updateBtns = document.querySelectorAll('.update-btn');
-    updateBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        console.log('Mise à jour du cours ' + btn.dataset.cours);
-        window.location.href = '/add?cours=' + btn.dataset.name + '&name=' + btn.dataset.cours;
-      });
-    });
-  </script>
-
-
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
@@ -180,6 +146,8 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
+
+  <script src="{{url_for('static', filename='script.js')}}"></script>
 </body>
 
 </html>
