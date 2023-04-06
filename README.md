@@ -14,3 +14,23 @@ Beautifulsoup\
 yfinance (bibliothèque Yahoo Finance)
 
 Bootstrap
+
+## Installation
+Pour installer le projet, il faut installer les dépendances avec la commande suivante :
+```
+pip install -r requirements.txt
+```
+
+## Lancement avec Flask (développement)
+Pour lancer le projet, il faut se placer dans le dossier du projet et lancer la commande suivante :
+```
+flask --app=main.py run
+```
+
+## Lancement avec Gunicorn (production)
+Pour lancer le projet, il faut se placer dans le dossier du projet et lancer la commande suivante :
+```
+gunicorn --bind
+```
+
+
