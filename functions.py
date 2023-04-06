@@ -27,13 +27,14 @@ def get_data_range(cours, range):
     today = datetime.datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     start_date = today
     if (range == "day"):
-        start_date = today - datetime.timedelta(days=2)
+        start_date = today - datetime.timedelta(days=2 + 1)
+        print(start_date)
     elif (range == "week"):
-        start_date = today - datetime.timedelta(days=8)
+        start_date = today - datetime.timedelta(days=8 + 1)
     elif (range == "month"):
-        start_date = today - datetime.timedelta(days=31)
+        start_date = today - datetime.timedelta(days=32 + 1)
     elif (range == "year"):
-        start_date = today - datetime.timedelta(days=365)
+        start_date = today - datetime.timedelta(days=366 + 1)
 
     # get data range sorted in descending order by dates
     return list(db[cours].find({"Date": {"$gt": start_date}}).sort([('Date', -1)]))
