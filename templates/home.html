@@ -88,6 +88,7 @@
     <script>
       // Appelle la route Flask pour récupérer le contenu HTML de la page Yahoo
       setInterval(() => {
+        console.log({{ loop.index }});
         fetch('/get/prices/{{ graph.name }}')
           .then(response => response.text())
           .then(html => {
