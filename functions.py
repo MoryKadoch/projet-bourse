@@ -10,7 +10,7 @@ db = client['projet-bourse']
 
 def add_csv_to_mongodb(cours, csv_file):
     db[cours].drop()
-    db[cours].create_index([("Date", pymongo.DESCENDING)])
+    db[cours].create_index([("Date", pymongo.ASCENDING)])
 
     with open(csv_file) as file:
         reader = csv.DictReader(file)
