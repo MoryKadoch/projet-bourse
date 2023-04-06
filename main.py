@@ -39,6 +39,9 @@ def home():
             data = functions.get_data(cours)
         except:
             continue
+
+        if(data.empty):
+            continue
         # Créer une trace pour le graphique
         trace = go.Scatter(
             x=pd.to_datetime(data['Date']),
