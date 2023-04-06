@@ -17,12 +17,12 @@ def add_csv_to_mongodb(cours, csv_file):
         data = []
         for row in reader:
             format_string = '%Y-%m-%d %H:%M:%S%z'
-            date = datetime.datetime.strptime(row["Date"], format_string)
+            date = datetime.datetime.strptime(row["Date"], format_string).replace(tzinfo=datetime.timezone.utc)
             row["Date"] = date
             data.append(row)
         db[cours].insert_many(data)
 
-# range = day|week|month
+# range = day|week|month|year
 def get_data_range(cours, range):
     today = datetime.datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     start_date = today
@@ -32,15 +32,17 @@ def get_data_range(cours, range):
         start_date = today - datetime.timedelta(days=8)
     elif (range == "month"):
         start_date = today - datetime.timedelta(days=31)
-    
+    elif (range == "year"):
+        start_date = today - datetime.timedelta(days=365)
+
     # get data range sorted in descending order by dates
-    return list(db[cours].find({"Date": {"$gt": str(start_date)}}).sort([('Date', -1)]))
+    return list(db[cours].find({"Date": {"$gt": start_date}}).sort([('Date', -1)]))
 
 def get_data(cours):
     return pd.DataFrame(db[cours].find().sort([('Date', 1)]))
 
 def update_stats(cours, name):
-    ranges = ["day", "week", "month"]
+    ranges = ["day", "week", "month", "year"]
     stats = {"cours": cours, "name": name}
     # TODO faire ci-dessous en mongodb
     for range in ranges:
