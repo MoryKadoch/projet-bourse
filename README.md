@@ -6,7 +6,11 @@ Sur le frontend, nous affichons le delta du jour. Ces données sont récupérée
 ## Technologies utilisées
 Le projet utilise les technologies suivantes :
 
-Flask\
+pymongo\
+Flask (Jinja 2)\
+Pandas\
 Plotly\
 Beautifulsoup\
+yfinance (bibliothèque Yahoo Finance)
+
 Bootstrap
