@@ -14,7 +14,12 @@ def add_csv_to_mongodb(cours, csv_file):
 
     with open(csv_file) as file:
         reader = csv.DictReader(file)
-        data = [row for row in reader]
+        data = []
+        for row in reader:
+            format_string = '%Y-%m-%d %H:%M:%S%z'
+            date = datetime.datetime.strptime(row["Date"], format_string)
+            row["Date"] = date
+            data.append(row)
         db[cours].insert_many(data)
 
 # range = day|week|month
